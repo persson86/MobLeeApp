@@ -18,7 +18,8 @@ public interface RestService {
     Call<SearchTagModel> getQuestionsByTag(@Query("order") String order,
                                            @Query("sort") String sort,
                                            @Query("tagged") String tagged,
-                                           @Query("site") String site);
+                                           @Query("site") String site,
+                                           @Query("pagesize") String pagesize);
 
     Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(BuildConfig.API_END_POINT)
