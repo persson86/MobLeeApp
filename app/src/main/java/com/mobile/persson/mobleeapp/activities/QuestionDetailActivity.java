@@ -7,17 +7,22 @@ import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mobile.persson.mobleeapp.R;
+import com.mobile.persson.mobleeapp.adapters.RecycleAnswersAdapter;
 import com.mobile.persson.mobleeapp.adapters.RecycleQuestionsAdapter;
 import com.mobile.persson.mobleeapp.database.dao.QuestionDAO;
+import com.mobile.persson.mobleeapp.database.models.AnswerItemModel;
+import com.mobile.persson.mobleeapp.database.models.AnswerModel;
 import com.mobile.persson.mobleeapp.database.models.SearchItemModel;
-import com.mobile.persson.mobleeapp.database.models.SearchTagModel;
 import com.mobile.persson.mobleeapp.network.RestService;
 
 import org.androidannotations.annotations.AfterViews;
@@ -34,39 +39,40 @@ import retrofit.Callback;
 import retrofit.Response;
 import retrofit.Retrofit;
 
-@EActivity(R.layout.activity_questions)
-public class QuestionsActivity extends AppCompatActivity {
-    private RestService service;
-    private Context context;
+@EActivity(R.layout.activity_question_detail)
+public class QuestionDetailActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
+    private Context context;
+    private RestService service;
 
-    private RecycleQuestionsAdapter recycleAdapter;
+    private RecycleAnswersAdapter recycleAdapter;
     private LinearLayoutManager layoutManager;
 
-    SearchTagModel searchTagModel;
-    List<SearchItemModel> searchItemModels;
+    SearchItemModel itemQuestion;
+    List<AnswerItemModel> answerItemModelList;
 
-    private String tag;
+    private int questionId = 0;
     private final String ORDER = "desc";
     private final String SORT = "activity";
     private final String SITE = "stackoverflow";
-    private final String PAGESIZE = "20";
 
     @Bean
     QuestionDAO questionDAO;
-/*    @Bean
-    DatabaseHelper dbHelper;*/
 
     @ViewById
-    RecyclerView rvQuestions;
+    TextView tvTitle;
+    @ViewById
+    TextView tvBody;
+    @ViewById
+    RecyclerView rvAnswers;
 
     @AfterViews
     void initialize() {
         startDialog();
         setActivityConfig();
         setScreenConfig();
-
-        restGetQuestionsByTag(tag);
+        loadContent();
+        restGetAnswers();
     }
 
     @Override
@@ -76,7 +82,7 @@ public class QuestionsActivity extends AppCompatActivity {
     }
 
     private void startDialog() {
-        progressDialog = new ProgressDialog(QuestionsActivity.this);
+        progressDialog = new ProgressDialog(QuestionDetailActivity.this);
         progressDialog.setTitle(getResources().getString(R.string.msg_retrieving_data));
         progressDialog.setMessage(getResources().getString(R.string.msg_wait));
         progressDialog.show();
@@ -84,7 +90,9 @@ public class QuestionsActivity extends AppCompatActivity {
 
     private void setActivityConfig() {
         context = getApplicationContext();
-        tag = (String) getIntent().getSerializableExtra("tag");
+        questionId = (Integer) getIntent().getSerializableExtra("question_id");
+
+        itemQuestion = questionDAO.getQuestionById(questionId);
     }
 
     private void setScreenConfig() {
@@ -95,39 +103,31 @@ public class QuestionsActivity extends AppCompatActivity {
         //loadToolbar();
     }
 
-    private void loadToolbar() {
-        //setSupportActionBar(toolbar);
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        //getSupportActionBar().setDisplayShowTitleEnabled(false);
-        //tvToolbarTitle.setText(R.string.toolbar_title);
-        //ivIcon.setVisibility(View.GONE);
-    }
+    private void loadContent() {
+        tvTitle.setText(itemQuestion.getTitle());
 
-    private String formatTag(String tag) {
-        tag = tag.toLowerCase();
-        tag = tag.replace(' ', '-');
-        return tag;
+        String htmlAsString = itemQuestion.getBody();
+        Spanned htmlAsSpanned = Html.fromHtml(htmlAsString);
+        tvBody.setText(htmlAsSpanned);
+
+        progressDialog.dismiss();
     }
 
     @Background
-    public void restGetQuestionsByTag(String tag) {
+    public void restGetAnswers() {
         service = RestService.retrofit.create(RestService.class);
-        final Call<SearchTagModel> call = service.getQuestionsByTag(
+        final Call<AnswerModel> call = service.getAnswers(
+                questionId,
                 ORDER,
                 SORT,
-                formatTag(tag),
                 SITE,
-                PAGESIZE,
-                getString(R.string.filter_body_tag));
+                getString(R.string.filter_body_answer));
 
-        call.enqueue(new Callback<SearchTagModel>() {
+        call.enqueue(new Callback<AnswerModel>() {
             @Override
-            public void onResponse(Response<SearchTagModel> response, Retrofit retrofit) {
-                searchTagModel = response.body();
-                searchItemModels = searchTagModel.getItems();
-
-                questionDAO.saveQuestions(searchItemModels);
-
+            public void onResponse(Response<AnswerModel> response, Retrofit retrofit) {
+                AnswerModel answerModel = response.body();
+                answerItemModelList = answerModel.getItems();
                 setRecycleViewConfig();
             }
 
@@ -143,24 +143,24 @@ public class QuestionsActivity extends AppCompatActivity {
     @UiThread
     public void setRecycleViewConfig() {
         layoutManager = new LinearLayoutManager(context);
-        rvQuestions.setLayoutManager(layoutManager);
-        rvQuestions.setHasFixedSize(true);
-        recycleAdapter = new RecycleQuestionsAdapter(context, searchItemModels);
-        rvQuestions.setAdapter(recycleAdapter);
+        rvAnswers.setLayoutManager(layoutManager);
+        rvAnswers.setHasFixedSize(true);
+        recycleAdapter = new RecycleAnswersAdapter(context, answerItemModelList);
+        rvAnswers.setAdapter(recycleAdapter);
 
         onClickListener();
         progressDialog.dismiss();
     }
 
+    //remover
     private void onClickListener() {
         recycleAdapter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                int i = searchItemModels.get(position).getQuestion_id();
-                QuestionDetailActivity_.intent(context)
+/*                QuestionDetailActivity_.intent(context)
                         .flags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         .extra("question_id", searchItemModels.get(position).getQuestion_id())
-                        .start();
+                        .start();*/
 
                 //overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
             }

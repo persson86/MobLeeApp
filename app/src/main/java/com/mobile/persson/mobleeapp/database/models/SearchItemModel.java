@@ -1,16 +1,14 @@
-package com.mobile.persson.mobleeapp.database;
+package com.mobile.persson.mobleeapp.database.models;
 
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.security.acl.Owner;
-import java.util.List;
+import io.realm.RealmObject;
 
 /**
  * Created by persson on 07/12/16.
  */
 
-public class SearchItemModel {
+public class SearchItemModel extends RealmObject {
     @SerializedName("owner")
     public SearchOwner owner;
     @SerializedName("score")
@@ -21,6 +19,12 @@ public class SearchItemModel {
     private int question_id;
     @SerializedName("title")
     private String title;
+    @SerializedName("body")
+    private String body;
+
+    public String getBody() {
+        return body;
+    }
 
     public SearchOwner getOwner() {
         return owner;

@@ -1,12 +1,14 @@
-package com.mobile.persson.mobleeapp.database;
+package com.mobile.persson.mobleeapp.database.models;
 
 import com.google.gson.annotations.SerializedName;
+
+import io.realm.RealmObject;
 
 /**
  * Created by persson on 07/12/16.
  */
 
-public class SearchOwner {
+public class SearchOwner extends RealmObject{
     @SerializedName("user_id")
     private int user_id;
     @SerializedName("profile_image")

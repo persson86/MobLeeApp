@@ -1,4 +1,4 @@
-package com.mobile.persson.mobleeapp.database;
+package com.mobile.persson.mobleeapp.database.models;
 
 import com.google.gson.annotations.SerializedName;
 

@@ -1,12 +1,14 @@
 package com.mobile.persson.mobleeapp.network;
 
 import com.mobile.persson.mobleeapp.BuildConfig;
-import com.mobile.persson.mobleeapp.database.SearchTagModel;
+import com.mobile.persson.mobleeapp.database.models.AnswerModel;
+import com.mobile.persson.mobleeapp.database.models.SearchTagModel;
 
 import retrofit.Call;
 import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;
 import retrofit.http.GET;
+import retrofit.http.Path;
 import retrofit.http.Query;
 
 /**
@@ -19,7 +21,15 @@ public interface RestService {
                                            @Query("sort") String sort,
                                            @Query("tagged") String tagged,
                                            @Query("site") String site,
-                                           @Query("pagesize") String pagesize);
+                                           @Query("pagesize") String pagesize,
+                                           @Query("filter") String filter);
+
+    @GET("questions/{questionId}/answers")
+    Call<AnswerModel> getAnswers(@Path("questionId") int questiondId,
+                                 @Query("order") String order,
+                                 @Query("sort") String sort,
+                                 @Query("site") String site,
+                                 @Query("filter") String filter);
 
     Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(BuildConfig.API_END_POINT)
