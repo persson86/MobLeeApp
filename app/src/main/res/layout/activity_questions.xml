@@ -7,10 +7,12 @@
     android:orientation="vertical"
     tools:context="com.mobile.persson.mobleeapp.activities.QuestionsActivity">
 
+    <include layout="@layout/fragment_toolbar" />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rvQuestions"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="0dp"></android.support.v7.widget.RecyclerView>
+        android:paddingTop="0dp" />
 
 </LinearLayout>

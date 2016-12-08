@@ -1,6 +1,7 @@
 package com.mobile.persson.mobleeapp.adapters;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +37,15 @@ public class RecycleTagsAdapter extends RecyclerView.Adapter<RecycleTagsAdapter.
     @Override
     public void onBindViewHolder(GridItemViewHolder holder, int position) {
         holder.tvTag.setText(tagsList.get(position));
+
+        if (holder.tvTag.getText() == "android" ||
+                holder.tvTag.getText() == "java" ||
+                holder.tvTag.getText() == "android-studio" ||
+                holder.tvTag.getText() == "marshmallow" ||
+                holder.tvTag.getText() == "nexus") {
+            holder.tvTag.setTypeface(Typeface.DEFAULT_BOLD);
+            holder.tvTag.setTextSize(18);
+        }
     }
 
     @Override

@@ -55,18 +55,7 @@ public class RecycleAnswersAdapter extends RecyclerView.Adapter<RecycleAnswersAd
         return answerList.size();
     }
 
-    public void setOnItemClickListener(AdapterView.OnItemClickListener onItemClickListener) {
-        this.itemClickListener = onItemClickListener;
-    }
-
-    private void onItemHolderClick(RecycleItemViewHolder itemHolder) {
-        if (itemClickListener != null) {
-            itemClickListener.onItemClick(null, itemHolder.itemView,
-                    itemHolder.getAdapterPosition(), itemHolder.getItemId());
-        }
-    }
-
-    public class RecycleItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class RecycleItemViewHolder extends RecyclerView.ViewHolder {
         public RecycleAnswersAdapter recycleAdapter;
         public TextView tvAnswer;
         public TextView tvUser;
@@ -78,12 +67,6 @@ public class RecycleAnswersAdapter extends RecyclerView.Adapter<RecycleAnswersAd
             tvAnswer = (TextView) itemView.findViewById(R.id.tvAnswer);
             tvUser = (TextView) itemView.findViewById(R.id.tvUser);
             ivUser = (ImageView) itemView.findViewById(R.id.ivUser);
-            itemView.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View v) {
-            recycleAdapter.onItemHolderClick(this);
         }
     }
 }

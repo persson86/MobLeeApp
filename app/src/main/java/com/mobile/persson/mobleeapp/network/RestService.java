@@ -3,6 +3,7 @@ package com.mobile.persson.mobleeapp.network;
 import com.mobile.persson.mobleeapp.BuildConfig;
 import com.mobile.persson.mobleeapp.database.models.AnswerModel;
 import com.mobile.persson.mobleeapp.database.models.SearchTagModel;
+import com.mobile.persson.mobleeapp.database.models.TagModel;
 
 import retrofit.Call;
 import retrofit.GsonConverterFactory;
@@ -30,6 +31,11 @@ public interface RestService {
                                  @Query("sort") String sort,
                                  @Query("site") String site,
                                  @Query("filter") String filter);
+
+    @GET("tags/{tag}/related")
+    Call<TagModel> getRelatedTags(@Path("tag") String tag,
+                                  @Query("site") String site,
+                                  @Query("pagesize") String pagesize);
 
     Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(BuildConfig.API_END_POINT)

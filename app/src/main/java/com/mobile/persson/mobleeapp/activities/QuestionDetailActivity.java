@@ -7,9 +7,11 @@ import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -43,10 +45,7 @@ import retrofit.Retrofit;
 public class QuestionDetailActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     private Context context;
-    private RestService service;
-
     private RecycleAnswersAdapter recycleAdapter;
-    private LinearLayoutManager layoutManager;
 
     SearchItemModel itemQuestion;
     List<AnswerItemModel> answerItemModelList;
@@ -58,27 +57,41 @@ public class QuestionDetailActivity extends AppCompatActivity {
 
     @Bean
     QuestionDAO questionDAO;
-
     @ViewById
     TextView tvTitle;
     @ViewById
     TextView tvBody;
     @ViewById
     RecyclerView rvAnswers;
+    @ViewById
+    Toolbar toolbar;
+    @ViewById
+    TextView tvToolbarTitle;
 
     @AfterViews
     void initialize() {
         startDialog();
         setActivityConfig();
         setScreenConfig();
-        loadContent();
         restGetAnswers();
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        //overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+        finish();
+        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private void startDialog() {
@@ -91,31 +104,35 @@ public class QuestionDetailActivity extends AppCompatActivity {
     private void setActivityConfig() {
         context = getApplicationContext();
         questionId = (Integer) getIntent().getSerializableExtra("question_id");
-
         itemQuestion = questionDAO.getQuestionById(questionId);
     }
 
     private void setScreenConfig() {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        loadToolbar();
+    }
 
-        //loadToolbar();
+    private void loadToolbar() {
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        tvToolbarTitle.setText(R.string.tit_question_detail);
     }
 
     private void loadContent() {
         tvTitle.setText(itemQuestion.getTitle());
+        tvBody.setText(convertHtmlToText(itemQuestion.getBody()));
+    }
 
-        String htmlAsString = itemQuestion.getBody();
+    private Spanned convertHtmlToText(String htmlContent) {
+        String htmlAsString = htmlContent;
         Spanned htmlAsSpanned = Html.fromHtml(htmlAsString);
-        tvBody.setText(htmlAsSpanned);
-
-        progressDialog.dismiss();
+        return htmlAsSpanned;
     }
 
     @Background
     public void restGetAnswers() {
-        service = RestService.retrofit.create(RestService.class);
+        RestService service = RestService.retrofit.create(RestService.class);
         final Call<AnswerModel> call = service.getAnswers(
                 questionId,
                 ORDER,
@@ -142,30 +159,15 @@ public class QuestionDetailActivity extends AppCompatActivity {
 
     @UiThread
     public void setRecycleViewConfig() {
-        layoutManager = new LinearLayoutManager(context);
+        loadContent();
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(context);
         rvAnswers.setLayoutManager(layoutManager);
         rvAnswers.setHasFixedSize(true);
         recycleAdapter = new RecycleAnswersAdapter(context, answerItemModelList);
         rvAnswers.setAdapter(recycleAdapter);
 
-        onClickListener();
         progressDialog.dismiss();
-    }
-
-    //remover
-    private void onClickListener() {
-        recycleAdapter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-/*                QuestionDetailActivity_.intent(context)
-                        .flags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        .extra("question_id", searchItemModels.get(position).getQuestion_id())
-                        .start();*/
-
-                //overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
-            }
-        });
-
     }
 
 }

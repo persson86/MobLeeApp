@@ -7,10 +7,13 @@ import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mobile.persson.mobleeapp.R;
@@ -36,12 +39,9 @@ import retrofit.Retrofit;
 
 @EActivity(R.layout.activity_questions)
 public class QuestionsActivity extends AppCompatActivity {
-    private RestService service;
     private Context context;
     private ProgressDialog progressDialog;
-
     private RecycleQuestionsAdapter recycleAdapter;
-    private LinearLayoutManager layoutManager;
 
     SearchTagModel searchTagModel;
     List<SearchItemModel> searchItemModels;
@@ -54,25 +54,37 @@ public class QuestionsActivity extends AppCompatActivity {
 
     @Bean
     QuestionDAO questionDAO;
-/*    @Bean
-    DatabaseHelper dbHelper;*/
-
     @ViewById
     RecyclerView rvQuestions;
+    @ViewById
+    Toolbar toolbar;
+    @ViewById
+    TextView tvToolbarTitle;
 
     @AfterViews
     void initialize() {
         startDialog();
         setActivityConfig();
         setScreenConfig();
-
-        restGetQuestionsByTag(tag);
+        restGetQuestionsByTag();
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        //overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+        finish();
+        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private void startDialog() {
@@ -89,33 +101,23 @@ public class QuestionsActivity extends AppCompatActivity {
 
     private void setScreenConfig() {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-        //loadToolbar();
+        loadToolbar();
     }
 
     private void loadToolbar() {
-        //setSupportActionBar(toolbar);
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        //getSupportActionBar().setDisplayShowTitleEnabled(false);
-        //tvToolbarTitle.setText(R.string.toolbar_title);
-        //ivIcon.setVisibility(View.GONE);
-    }
-
-    private String formatTag(String tag) {
-        tag = tag.toLowerCase();
-        tag = tag.replace(' ', '-');
-        return tag;
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        tvToolbarTitle.setText(R.string.tit_questions);
     }
 
     @Background
-    public void restGetQuestionsByTag(String tag) {
-        service = RestService.retrofit.create(RestService.class);
+    public void restGetQuestionsByTag() {
+        RestService service = RestService.retrofit.create(RestService.class);
         final Call<SearchTagModel> call = service.getQuestionsByTag(
                 ORDER,
                 SORT,
-                formatTag(tag),
+                tag,
                 SITE,
                 PAGESIZE,
                 getString(R.string.filter_body_tag));
@@ -142,7 +144,7 @@ public class QuestionsActivity extends AppCompatActivity {
 
     @UiThread
     public void setRecycleViewConfig() {
-        layoutManager = new LinearLayoutManager(context);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(context);
         rvQuestions.setLayoutManager(layoutManager);
         rvQuestions.setHasFixedSize(true);
         recycleAdapter = new RecycleQuestionsAdapter(context, searchItemModels);
@@ -156,13 +158,12 @@ public class QuestionsActivity extends AppCompatActivity {
         recycleAdapter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                int i = searchItemModels.get(position).getQuestion_id();
                 QuestionDetailActivity_.intent(context)
                         .flags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         .extra("question_id", searchItemModels.get(position).getQuestion_id())
                         .start();
 
-                //overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+                overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
             }
         });
 

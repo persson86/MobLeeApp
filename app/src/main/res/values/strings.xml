@@ -6,4 +6,7 @@
     <string name="msg_no_internet">No internet connection</string>
     <string name="filter_body_tag">!)rCcH9eUg2.9nJZutx5P</string>
     <string name="filter_body_answer">!9YdnSMKKT</string>
+    <string name="tit_tags">Tags</string>
+    <string name="tit_questions">Questions</string>
+    <string name="tit_question_detail">Question Detail</string>
 </resources>
