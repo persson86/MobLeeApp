@@ -3,15 +3,19 @@ package com.mobile.persson.mobleeapp.activities;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.mobile.persson.mobleeapp.R;
 import com.mobile.persson.mobleeapp.adapters.RecycleAnswersAdapter;
 import com.mobile.persson.mobleeapp.database.dao.AnswerDAO;
@@ -61,7 +65,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
     @ViewById
     TextView tvBody;
     @ViewById
-    RecyclerView rvAnswers;
+    TextView tvNumberAnswers;
     @ViewById
     Toolbar toolbar;
     @ViewById
@@ -113,7 +117,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
         tvToolbarTitle.setText(R.string.tit_question_detail);
     }
 
-    private void loadContent() {
+    private void loadHeaderContent() {
         QuestionItemModel questionItemModel = questionDAO.getQuestionById(questionId);
         tvTitle.setText(questionItemModel.getTitle());
         tvBody.setText(StringUtil.convertHtmlToText(questionItemModel.getBody()));
@@ -125,7 +129,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
         answerItemModelList = answerDAO.getAnswersByQuestion(questionId);
 
         if (answerItemModelList.size() > 0) {
-            setRecycleViewConfig(true);
+            setAnswersLayout(true);
             return;
         }
 
@@ -145,7 +149,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
                 if (answerModel != null) {
                     answerItemModelList = answerModel.getItems();
                     saveDataIntoRealm();
-                    setRecycleViewConfig(false);
+                    setAnswersLayout(false);
                 } else
                     Toast.makeText(context, getString(R.string.msg_server_not_responding), Toast.LENGTH_LONG).show();
             }
@@ -164,14 +168,43 @@ public class QuestionDetailActivity extends AppCompatActivity {
     }
 
     @UiThread
-    public void setRecycleViewConfig(boolean fromRealm) {
-        loadContent();
+    public void setAnswersLayout(boolean fromRealm) {
+        loadHeaderContent();
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(context);
+/*        LinearLayoutManager layoutManager = new LinearLayoutManager(context);
         rvAnswers.setLayoutManager(layoutManager);
         rvAnswers.setHasFixedSize(true);
         recycleAdapter = new RecycleAnswersAdapter(context, adjustContentList(fromRealm));
-        rvAnswers.setAdapter(recycleAdapter);
+        rvAnswers.setAdapter(recycleAdapter);*/
+//------------------------------
+
+        LayoutInflater inflater;
+        inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LinearLayout llContent = (LinearLayout) findViewById(R.id.llContent);
+        List<AnswerItemModel> list = adjustContentList(fromRealm);
+
+        int numAnswers = list.size();
+        String totalAnswers = String.valueOf(numAnswers) + " " + "Answers";
+        tvNumberAnswers.setText(totalAnswers);
+
+        for (AnswerItemModel answer : list) {
+            View view = inflater.inflate(R.layout.item_answer_list, null);
+            TextView tvAnswer = (TextView) view.findViewById(R.id.tvAnswer);
+            TextView tvUser = (TextView) view.findViewById(R.id.tvUser);
+
+            ImageView ivUser = (ImageView) view.findViewById(R.id.ivUser);
+            tvAnswer.setText(answer.getBody());
+            tvUser.setText(answer.getOwner().getDisplay_name());
+
+            Glide.with(ivUser.getContext())
+                    .load(answer.getOwner().getProfile_image())
+                    .into(ivUser);
+
+            int acceptedAnswer = Color.parseColor("#4CAF50");
+            if (answer.is_accepted())
+                tvAnswer.setTextColor(acceptedAnswer);
+            llContent.addView(view);
+        }
 
         progressDialog.dismiss();
     }
