@@ -17,6 +17,8 @@ import android.widget.Toast;
 
 import com.mobile.persson.mobleeapp.R;
 import com.mobile.persson.mobleeapp.adapters.RecycleTagsAdapter;
+import com.mobile.persson.mobleeapp.database.dao.AnswerDAO;
+import com.mobile.persson.mobleeapp.database.dao.QuestionDAO;
 import com.mobile.persson.mobleeapp.database.dao.TagDAO;
 import com.mobile.persson.mobleeapp.database.models.TagItemModel;
 import com.mobile.persson.mobleeapp.database.models.TagModel;
@@ -53,6 +55,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Bean
     TagDAO tagDAO;
+    @Bean
+    QuestionDAO questionDAO;
+    @Bean
+    AnswerDAO answerDAO;
     @ViewById
     RecyclerView rvTags;
     @ViewById
@@ -67,8 +73,14 @@ public class MainActivity extends AppCompatActivity {
         context = getApplicationContext();
 
         startDialog();
+        cleanRealm();
         setScreenConfig();
         getGetRelatedTags();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     private void startDialog() {
@@ -76,6 +88,12 @@ public class MainActivity extends AppCompatActivity {
         progressDialog.setTitle(getResources().getString(R.string.msg_retrieving_data));
         progressDialog.setMessage(getResources().getString(R.string.msg_wait));
         progressDialog.show();
+    }
+
+    private void cleanRealm() {
+        answerDAO.deleteAllAnswers();
+        questionDAO.deleteAllQuestions();
+        tagDAO.deleteTags();
     }
 
     private void setScreenConfig() {
@@ -131,7 +149,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void saveDataIntoRealm() {
-        tagDAO.deleteTags();
         tagDAO.saveTags(tagItemModelList);
     }
 
@@ -172,7 +189,8 @@ public class MainActivity extends AppCompatActivity {
         tagList.add("nexus");
 
         if (fromRealm)
-            tagItemModelList = tagDAO.getTags();
+            tagItemModelList = new ArrayList<>();
+        tagItemModelList = tagDAO.getTags();
 
         for (TagItemModel tag : tagItemModelList) {
             tagList.add(tag.getName());

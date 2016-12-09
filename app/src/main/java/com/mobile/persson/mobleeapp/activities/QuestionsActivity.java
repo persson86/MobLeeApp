@@ -108,7 +108,9 @@ public class QuestionsActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        tvToolbarTitle.setText(R.string.tit_questions);
+
+        String title = tag + " " + getString(R.string.tit_questions);
+        tvToolbarTitle.setText(title);
     }
 
     @Background
@@ -158,7 +160,6 @@ public class QuestionsActivity extends AppCompatActivity {
         for (QuestionItemModel m : questionItemModelList)
             m.setTag(tag);
 
-        questionDAO.deleteQuestionsByTag(tag);
         questionDAO.saveQuestionsByTag(questionItemModelList);
     }
 

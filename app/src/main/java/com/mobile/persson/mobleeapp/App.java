@@ -6,6 +6,7 @@ import android.os.SystemClock;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EApplication;
 
+import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -21,7 +22,7 @@ public class App extends Application {
     }
 
     @Background
-    public void sleepScreen(){
+    public void sleepScreen() {
         SystemClock.sleep(TimeUnit.SECONDS.toMillis(2));
     }
 }

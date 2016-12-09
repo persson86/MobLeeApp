@@ -26,10 +26,10 @@ public class AnswerDAO {
     @Bean
     DatabaseHelper dbHelper;
 
-    public void saveAnswers(List<AnswerItemModel> model) {
+    public void saveAnswersByQuestion(List<AnswerItemModel> model, long questionId) {
         Realm realm = dbHelper.getRealm();
         realm.beginTransaction();
-        realm.where(AnswerItemModel.class).findAll().deleteAllFromRealm();
+        realm.where(AnswerItemModel.class).equalTo("question_id", questionId).findAll().deleteAllFromRealm();
         realm.commitTransaction();
         realm.beginTransaction();
         realm.copyToRealm(model);
@@ -50,5 +50,17 @@ public class AnswerDAO {
         realm.where(AnswerItemModel.class).equalTo("question_id", questionId).findAll().deleteAllFromRealm();
         realm.commitTransaction();
         realm.close();
+    }
+
+    public void deleteAllAnswers() {
+        Realm realm = dbHelper.getRealm();
+        realm.beginTransaction();
+        realm.where(AnswerItemModel.class).findAll().deleteAllFromRealm();
+        realm.commitTransaction();
+        realm.close();
+    }
+
+    public int getSize() {
+        return dbHelper.getRealm().where(AnswerItemModel.class).findAll().size();
     }
 }

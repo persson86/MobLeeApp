@@ -160,8 +160,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
     }
 
     private void saveDataIntoRealm() {
-        answerDAO.deleteAnswersByQuestion(questionId);
-        answerDAO.saveAnswers(answerItemModelList);
+        answerDAO.saveAnswersByQuestion(answerItemModelList, questionId);
     }
 
     @UiThread

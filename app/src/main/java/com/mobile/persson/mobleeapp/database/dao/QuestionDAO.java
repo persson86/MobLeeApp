@@ -55,4 +55,12 @@ public class QuestionDAO {
         realm.close();
     }
 
+    public void deleteAllQuestions() {
+        Realm realm = dbHelper.getRealm();
+        realm.beginTransaction();
+        realm.where(QuestionItemModel.class).findAll().deleteAllFromRealm();
+        realm.commitTransaction();
+        realm.close();
+    }
+
 }
