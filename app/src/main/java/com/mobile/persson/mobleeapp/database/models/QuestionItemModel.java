@@ -8,9 +8,9 @@ import io.realm.RealmObject;
  * Created by persson on 07/12/16.
  */
 
-public class SearchItemModel extends RealmObject {
+public class QuestionItemModel extends RealmObject {
     @SerializedName("owner")
-    public SearchOwner owner;
+    public OwnerModel owner;
     @SerializedName("score")
     private int score;
     @SerializedName("last_activity_date")
@@ -22,11 +22,21 @@ public class SearchItemModel extends RealmObject {
     @SerializedName("body")
     private String body;
 
+    private String tag;
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
     public String getBody() {
         return body;
     }
 
-    public SearchOwner getOwner() {
+    public OwnerModel getOwner() {
         return owner;
     }
 

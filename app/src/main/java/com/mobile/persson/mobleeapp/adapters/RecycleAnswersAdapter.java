@@ -14,7 +14,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.mobile.persson.mobleeapp.R;
 import com.mobile.persson.mobleeapp.database.models.AnswerItemModel;
-import com.mobile.persson.mobleeapp.database.models.SearchItemModel;
+import com.mobile.persson.mobleeapp.utils.StringUtil;
 
 import java.util.List;
 
@@ -40,9 +40,7 @@ public class RecycleAnswersAdapter extends RecyclerView.Adapter<RecycleAnswersAd
 
     @Override
     public void onBindViewHolder(RecycleItemViewHolder holder, int position) {
-        String htmlAsString = answerList.get(position).getBody();
-        Spanned htmlAsSpanned = Html.fromHtml(htmlAsString);
-        holder.tvAnswer.setText(htmlAsSpanned);
+        holder.tvAnswer.setText(StringUtil.convertHtmlToText(answerList.get(position).getBody()));
         holder.tvUser.setText(String.valueOf(answerList.get(position).getOwner().getDisplay_name()));
 
         Glide.with(holder.ivUser.getContext())

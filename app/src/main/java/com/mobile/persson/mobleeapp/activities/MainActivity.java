@@ -11,19 +11,20 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mobile.persson.mobleeapp.R;
 import com.mobile.persson.mobleeapp.adapters.RecycleTagsAdapter;
+import com.mobile.persson.mobleeapp.database.dao.TagDAO;
 import com.mobile.persson.mobleeapp.database.models.TagItemModel;
 import com.mobile.persson.mobleeapp.database.models.TagModel;
 import com.mobile.persson.mobleeapp.network.RestService;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
@@ -31,7 +32,6 @@ import org.androidannotations.annotations.ViewById;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import retrofit.Call;
 import retrofit.Callback;
@@ -51,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     private final String SITE = "stackoverflow";
     private final String PAGESIZE = "20";
 
+    @Bean
+    TagDAO tagDAO;
     @ViewById
     RecyclerView rvTags;
     @ViewById
@@ -62,10 +64,11 @@ public class MainActivity extends AppCompatActivity {
 
     @AfterViews
     void initialize() {
+        context = getApplicationContext();
+
         startDialog();
-        setActivityConfig();
         setScreenConfig();
-        restGetRelatedTags();
+        getGetRelatedTags();
     }
 
     private void startDialog() {
@@ -73,10 +76,6 @@ public class MainActivity extends AppCompatActivity {
         progressDialog.setTitle(getResources().getString(R.string.msg_retrieving_data));
         progressDialog.setMessage(getResources().getString(R.string.msg_wait));
         progressDialog.show();
-    }
-
-    private void setActivityConfig() {
-        context = getApplicationContext();
     }
 
     private void setScreenConfig() {
@@ -92,7 +91,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Background
-    public void restGetRelatedTags() {
+    public void getGetRelatedTags() {
+        tagItemModelList = new ArrayList<>();
+        tagItemModelList = tagDAO.getTags();
+
+        if (tagItemModelList.size() > 0) {
+            setRecycleViewConfig(true);
+            return;
+        }
+
         RestService service = RestService.retrofit.create(RestService.class);
         final Call<TagModel> call = service.getRelatedTags(
                 TAG,
@@ -103,8 +110,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Response<TagModel> response, Retrofit retrofit) {
                 TagModel tagModel = response.body();
-                tagItemModelList = tagModel.getItems();
-                setRecycleViewConfig();
+
+                if (tagModel != null) {
+                    tagItemModelList = tagModel.getItems();
+                    saveDataIntoRealm();
+                    setRecycleViewConfig(false);
+                } else {
+                    Toast.makeText(context, getString(R.string.msg_server_not_responding), Toast.LENGTH_LONG).show();
+                    progressDialog.dismiss();
+                }
             }
 
             @Override
@@ -116,12 +130,17 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void saveDataIntoRealm() {
+        tagDAO.deleteTags();
+        tagDAO.saveTags(tagItemModelList);
+    }
+
     @UiThread
-    public void setRecycleViewConfig() {
+    public void setRecycleViewConfig(boolean fromRealm) {
         LinearLayoutManager layoutManager = new GridLayoutManager(MainActivity.this, 2);
         rvTags.setLayoutManager(layoutManager);
         rvTags.setHasFixedSize(true);
-        recycleAdapter = new RecycleTagsAdapter(context, sortContentList());
+        recycleAdapter = new RecycleTagsAdapter(context, adjustContentList(fromRealm));
         rvTags.setAdapter(recycleAdapter);
 
         onClickListener();
@@ -132,9 +151,10 @@ public class MainActivity extends AppCompatActivity {
         recycleAdapter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                QuestionsActivity_.intent(context)
+                QuestionsActivity_
+                        .intent(context)
+                        .tag(tagList.get(position))
                         .flags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        .extra("tag", tagList.get(position).toString())
                         .start();
 
                 overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
@@ -143,13 +163,16 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private List<String> sortContentList() {
+    private List<String> adjustContentList(boolean fromRealm) {
         tagList = new ArrayList<>();
         tagList.add("android");
         tagList.add("java");
         tagList.add("android-studio");
         tagList.add("marshmallow");
         tagList.add("nexus");
+
+        if (fromRealm)
+            tagItemModelList = tagDAO.getTags();
 
         for (TagItemModel tag : tagItemModelList) {
             tagList.add(tag.getName());

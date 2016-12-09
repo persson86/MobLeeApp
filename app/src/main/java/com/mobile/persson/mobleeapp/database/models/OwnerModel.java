@@ -8,7 +8,7 @@ import io.realm.RealmObject;
  * Created by persson on 07/12/16.
  */
 
-public class SearchOwner extends RealmObject{
+public class OwnerModel extends RealmObject{
     @SerializedName("user_id")
     private int user_id;
     @SerializedName("profile_image")

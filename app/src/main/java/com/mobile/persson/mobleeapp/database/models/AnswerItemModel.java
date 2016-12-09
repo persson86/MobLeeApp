@@ -10,9 +10,11 @@ import io.realm.RealmObject;
 
 public class AnswerItemModel extends RealmObject{
     @SerializedName("owner")
-    public SearchOwner owner;
+    public OwnerModel owner;
     @SerializedName("answer_id")
     private int answer_id;
+    @SerializedName("question_id")
+    private int question_id;
     @SerializedName("body")
     private String body;
     @SerializedName("is_accepted")
@@ -22,12 +24,16 @@ public class AnswerItemModel extends RealmObject{
         return body;
     }
 
-    public SearchOwner getOwner() {
+    public OwnerModel getOwner() {
         return owner;
     }
 
     public int getAnswer_id() {
         return answer_id;
+    }
+
+    public int getQuestion_id() {
+        return question_id;
     }
 
     public boolean is_accepted() {

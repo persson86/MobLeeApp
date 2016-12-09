@@ -2,7 +2,7 @@ package com.mobile.persson.mobleeapp.network;
 
 import com.mobile.persson.mobleeapp.BuildConfig;
 import com.mobile.persson.mobleeapp.database.models.AnswerModel;
-import com.mobile.persson.mobleeapp.database.models.SearchTagModel;
+import com.mobile.persson.mobleeapp.database.models.QuestionModel;
 import com.mobile.persson.mobleeapp.database.models.TagModel;
 
 import retrofit.Call;
@@ -18,12 +18,12 @@ import retrofit.http.Query;
 
 public interface RestService {
     @GET("search")
-    Call<SearchTagModel> getQuestionsByTag(@Query("order") String order,
-                                           @Query("sort") String sort,
-                                           @Query("tagged") String tagged,
-                                           @Query("site") String site,
-                                           @Query("pagesize") String pagesize,
-                                           @Query("filter") String filter);
+    Call<QuestionModel> getQuestionsByTag(@Query("order") String order,
+                                          @Query("sort") String sort,
+                                          @Query("tagged") String tagged,
+                                          @Query("site") String site,
+                                          @Query("pagesize") String pagesize,
+                                          @Query("filter") String filter);
 
     @GET("questions/{questionId}/answers")
     Call<AnswerModel> getAnswers(@Path("questionId") int questiondId,

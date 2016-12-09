@@ -8,11 +8,11 @@ import java.util.List;
  * Created by persson on 07/12/16.
  */
 
-public class SearchTagModel {
+public class QuestionModel {
     @SerializedName("items")
-    private List<SearchItemModel> items;
+    private List<QuestionItemModel> items;
 
-    public List<SearchItemModel> getItems() {
+    public List<QuestionItemModel> getItems() {
         return items;
     }
 }

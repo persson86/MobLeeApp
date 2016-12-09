@@ -2,38 +2,35 @@ package com.mobile.persson.mobleeapp.activities;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
-import android.text.Spanned;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mobile.persson.mobleeapp.R;
 import com.mobile.persson.mobleeapp.adapters.RecycleAnswersAdapter;
-import com.mobile.persson.mobleeapp.adapters.RecycleQuestionsAdapter;
+import com.mobile.persson.mobleeapp.database.dao.AnswerDAO;
 import com.mobile.persson.mobleeapp.database.dao.QuestionDAO;
 import com.mobile.persson.mobleeapp.database.models.AnswerItemModel;
 import com.mobile.persson.mobleeapp.database.models.AnswerModel;
-import com.mobile.persson.mobleeapp.database.models.SearchItemModel;
+import com.mobile.persson.mobleeapp.database.models.QuestionItemModel;
 import com.mobile.persson.mobleeapp.network.RestService;
+import com.mobile.persson.mobleeapp.utils.StringUtil;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit.Call;
@@ -47,16 +44,18 @@ public class QuestionDetailActivity extends AppCompatActivity {
     private Context context;
     private RecycleAnswersAdapter recycleAdapter;
 
-    SearchItemModel itemQuestion;
     List<AnswerItemModel> answerItemModelList;
 
-    private int questionId = 0;
     private final String ORDER = "desc";
     private final String SORT = "activity";
     private final String SITE = "stackoverflow";
 
+    @Extra
+    int questionId;
     @Bean
     QuestionDAO questionDAO;
+    @Bean
+    AnswerDAO answerDAO;
     @ViewById
     TextView tvTitle;
     @ViewById
@@ -70,10 +69,11 @@ public class QuestionDetailActivity extends AppCompatActivity {
 
     @AfterViews
     void initialize() {
+        context = getApplicationContext();
+
         startDialog();
-        setActivityConfig();
         setScreenConfig();
-        restGetAnswers();
+        getAnswersByQuestion();
     }
 
     @Override
@@ -101,12 +101,6 @@ public class QuestionDetailActivity extends AppCompatActivity {
         progressDialog.show();
     }
 
-    private void setActivityConfig() {
-        context = getApplicationContext();
-        questionId = (Integer) getIntent().getSerializableExtra("question_id");
-        itemQuestion = questionDAO.getQuestionById(questionId);
-    }
-
     private void setScreenConfig() {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         loadToolbar();
@@ -120,18 +114,21 @@ public class QuestionDetailActivity extends AppCompatActivity {
     }
 
     private void loadContent() {
-        tvTitle.setText(itemQuestion.getTitle());
-        tvBody.setText(convertHtmlToText(itemQuestion.getBody()));
-    }
-
-    private Spanned convertHtmlToText(String htmlContent) {
-        String htmlAsString = htmlContent;
-        Spanned htmlAsSpanned = Html.fromHtml(htmlAsString);
-        return htmlAsSpanned;
+        QuestionItemModel questionItemModel = questionDAO.getQuestionById(questionId);
+        tvTitle.setText(questionItemModel.getTitle());
+        tvBody.setText(StringUtil.convertHtmlToText(questionItemModel.getBody()));
     }
 
     @Background
-    public void restGetAnswers() {
+    public void getAnswersByQuestion() {
+        answerItemModelList = new ArrayList<>();
+        answerItemModelList = answerDAO.getAnswersByQuestion(questionId);
+
+        if (answerItemModelList.size() > 0) {
+            setRecycleViewConfig(true);
+            return;
+        }
+
         RestService service = RestService.retrofit.create(RestService.class);
         final Call<AnswerModel> call = service.getAnswers(
                 questionId,
@@ -144,8 +141,13 @@ public class QuestionDetailActivity extends AppCompatActivity {
             @Override
             public void onResponse(Response<AnswerModel> response, Retrofit retrofit) {
                 AnswerModel answerModel = response.body();
-                answerItemModelList = answerModel.getItems();
-                setRecycleViewConfig();
+
+                if (answerModel != null) {
+                    answerItemModelList = answerModel.getItems();
+                    saveDataIntoRealm();
+                    setRecycleViewConfig(false);
+                } else
+                    Toast.makeText(context, getString(R.string.msg_server_not_responding), Toast.LENGTH_LONG).show();
             }
 
             @Override
@@ -157,17 +159,34 @@ public class QuestionDetailActivity extends AppCompatActivity {
         });
     }
 
+    private void saveDataIntoRealm() {
+        answerDAO.deleteAnswersByQuestion(questionId);
+        answerDAO.saveAnswers(answerItemModelList);
+    }
+
     @UiThread
-    public void setRecycleViewConfig() {
+    public void setRecycleViewConfig(boolean fromRealm) {
         loadContent();
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
         rvAnswers.setLayoutManager(layoutManager);
         rvAnswers.setHasFixedSize(true);
-        recycleAdapter = new RecycleAnswersAdapter(context, answerItemModelList);
+        recycleAdapter = new RecycleAnswersAdapter(context, adjustContentList(fromRealm));
         rvAnswers.setAdapter(recycleAdapter);
 
         progressDialog.dismiss();
     }
 
+    private List<AnswerItemModel> adjustContentList(boolean fromRealm) {
+        List<AnswerItemModel> contentList = new ArrayList<>();
+
+        if (fromRealm) {
+            List<AnswerItemModel> realmList = answerDAO.getAnswersByQuestion(questionId);
+            for (AnswerItemModel model : realmList)
+                contentList.add(model);
+        } else
+            contentList = answerItemModelList;
+
+        return contentList;
+    }
 }

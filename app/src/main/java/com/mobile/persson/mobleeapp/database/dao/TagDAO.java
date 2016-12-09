@@ -3,7 +3,7 @@ package com.mobile.persson.mobleeapp.database.dao;
 import android.content.Context;
 
 import com.mobile.persson.mobleeapp.database.DatabaseHelper;
-import com.mobile.persson.mobleeapp.database.models.QuestionItemModel;
+import com.mobile.persson.mobleeapp.database.models.TagItemModel;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EBean;
@@ -18,39 +18,31 @@ import io.realm.Realm;
  */
 
 @EBean(scope = EBean.Scope.Singleton)
-public class QuestionDAO {
+public class TagDAO {
     @RootContext
     Context context;
 
     @Bean
     DatabaseHelper dbHelper;
 
-    public void saveQuestionsByTag(List<QuestionItemModel> model) {
+    public void saveTags(List<TagItemModel> model) {
         Realm realm = dbHelper.getRealm();
         realm.beginTransaction();
-        realm.where(QuestionItemModel.class).findAll().deleteAllFromRealm();
+        realm.where(TagItemModel.class).findAll().deleteAllFromRealm();
         realm.commitTransaction();
         realm.beginTransaction();
         realm.copyToRealm(model);
         realm.commitTransaction();
     }
 
-    public List<QuestionItemModel> getQuestionsByTag(String tag) {
-        return dbHelper.getRealm().where(QuestionItemModel.class).equalTo("tag", tag).findAll();
+    public List<TagItemModel> getTags() {
+        return dbHelper.getRealm().where(TagItemModel.class).findAll();
     }
 
-    public QuestionItemModel getQuestionById(long question_id) {
-        return dbHelper.getRealm().where(QuestionItemModel.class).equalTo("question_id", question_id).findFirst();
-    }
-
-    public int getSize() {
-        return dbHelper.getRealm().where(QuestionItemModel.class).findAll().size();
-    }
-
-    public void deleteQuestionsByTag(String tag) {
+    public void deleteTags() {
         Realm realm = dbHelper.getRealm();
         realm.beginTransaction();
-        realm.where(QuestionItemModel.class).equalTo("tag", tag).findAll().deleteAllFromRealm();
+        realm.where(TagItemModel.class).findAll().deleteAllFromRealm();
         realm.commitTransaction();
         realm.close();
     }

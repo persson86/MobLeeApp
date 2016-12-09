@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.mobile.persson.mobleeapp.R;
-import com.mobile.persson.mobleeapp.database.models.SearchItemModel;
+import com.mobile.persson.mobleeapp.database.models.QuestionItemModel;
 
 import java.util.List;
 
@@ -20,11 +20,11 @@ import java.util.List;
  */
 
 public class RecycleQuestionsAdapter extends RecyclerView.Adapter<RecycleQuestionsAdapter.RecycleItemViewHolder> {
-    private List<SearchItemModel> questionsList;
+    private List<QuestionItemModel> questionsList;
     private Context context;
     private AdapterView.OnItemClickListener itemClickListener;
 
-    public RecycleQuestionsAdapter(Context c, List<SearchItemModel> content) {
+    public RecycleQuestionsAdapter(Context c, List<QuestionItemModel> content) {
         questionsList = content;
         context = c;
     }
