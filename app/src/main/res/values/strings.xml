@@ -1,3 +1,23 @@
 <resources>
     <string name="app_name">MobLeeApp</string>
+    <string name="msg_retrieving_data">Retrieving data</string>
+    <string name="log_error">CUSTOM_LOG_ERROR</string>
+
+    <string name="msg_wait">wait...</string>
+    <string name="msg_no_internet">No internet connection</string>
+    <string name="msg_server_not_responding">Server not responding</string>
+
+    <string name="filter_body_tag">!)rCcH9eUg2.9nJZutx5P</string>
+    <string name="filter_body_answer">!9YdnSMKKT</string>
+
+    <string name="tit_tags">Tags</string>
+    <string name="tit_questions">Questions</string>
+    <string name="tit_question_detail">Question Detail</string>
+    <string name="tit_answer">answer</string>
+    <string name="tit_answers">answers</string>
+    <string name="tit_score">Score</string>
+    <string name="tit_accepted_answer">accepted answer</string>
+
+    <string name="html_text">text/html</string>
+    <string name="html_utf">UTF-8</string>
 </resources>
