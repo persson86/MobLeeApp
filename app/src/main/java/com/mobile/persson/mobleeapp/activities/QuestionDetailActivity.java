@@ -3,13 +3,13 @@ package com.mobile.persson.mobleeapp.activities;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -17,7 +17,6 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.mobile.persson.mobleeapp.R;
-import com.mobile.persson.mobleeapp.adapters.RecycleAnswersAdapter;
 import com.mobile.persson.mobleeapp.database.dao.AnswerDAO;
 import com.mobile.persson.mobleeapp.database.dao.QuestionDAO;
 import com.mobile.persson.mobleeapp.database.models.AnswerItemModel;
@@ -46,7 +45,6 @@ import retrofit.Retrofit;
 public class QuestionDetailActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     private Context context;
-    private RecycleAnswersAdapter recycleAdapter;
 
     List<AnswerItemModel> answerItemModelList;
 
@@ -63,13 +61,13 @@ public class QuestionDetailActivity extends AppCompatActivity {
     @ViewById
     TextView tvTitle;
     @ViewById
-    TextView tvBody;
-    @ViewById
     TextView tvNumberAnswers;
     @ViewById
     Toolbar toolbar;
     @ViewById
     TextView tvToolbarTitle;
+    @ViewById
+    WebView wbBody;
 
     @AfterViews
     void initialize() {
@@ -120,7 +118,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
     private void loadHeaderContent() {
         QuestionItemModel questionItemModel = questionDAO.getQuestionById(questionId);
         tvTitle.setText(questionItemModel.getTitle());
-        tvBody.setText(StringUtil.convertHtmlToText(questionItemModel.getBody()));
+        wbBody.loadData(StringUtil.parseSourceCode(questionItemModel.getBody()), "text/html", "UTF-8");
     }
 
     @Background
@@ -171,15 +169,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
     public void setAnswersLayout(boolean fromRealm) {
         loadHeaderContent();
 
-/*        LinearLayoutManager layoutManager = new LinearLayoutManager(context);
-        rvAnswers.setLayoutManager(layoutManager);
-        rvAnswers.setHasFixedSize(true);
-        recycleAdapter = new RecycleAnswersAdapter(context, adjustContentList(fromRealm));
-        rvAnswers.setAdapter(recycleAdapter);*/
-//------------------------------
 
-        LayoutInflater inflater;
-        inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         LinearLayout llContent = (LinearLayout) findViewById(R.id.llContent);
         List<AnswerItemModel> list = adjustContentList(fromRealm);
 
@@ -187,24 +177,8 @@ public class QuestionDetailActivity extends AppCompatActivity {
         String totalAnswers = String.valueOf(numAnswers) + " " + "Answers";
         tvNumberAnswers.setText(totalAnswers);
 
-        for (AnswerItemModel answer : list) {
-            View view = inflater.inflate(R.layout.item_answer_list, null);
-            TextView tvAnswer = (TextView) view.findViewById(R.id.tvAnswer);
-            TextView tvUser = (TextView) view.findViewById(R.id.tvUser);
-
-            ImageView ivUser = (ImageView) view.findViewById(R.id.ivUser);
-            tvAnswer.setText(answer.getBody());
-            tvUser.setText(answer.getOwner().getDisplay_name());
-
-            Glide.with(ivUser.getContext())
-                    .load(answer.getOwner().getProfile_image())
-                    .into(ivUser);
-
-            int acceptedAnswer = Color.parseColor("#4CAF50");
-            if (answer.is_accepted())
-                tvAnswer.setTextColor(acceptedAnswer);
-            llContent.addView(view);
-        }
+        for (AnswerItemModel answer : list)
+            llContent.addView(loadAnswers(answer));
 
         progressDialog.dismiss();
     }
@@ -220,5 +194,29 @@ public class QuestionDetailActivity extends AppCompatActivity {
             contentList = answerItemModelList;
 
         return contentList;
+    }
+
+    private View loadAnswers(AnswerItemModel answer) {
+        LayoutInflater inflater;
+        inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = inflater.inflate(R.layout.item_answer_list, null);
+        TextView tvAcceptedAnswer = (TextView) view.findViewById(R.id.tvAcceptedAnswer);
+        WebView wbAnswer = (WebView) view.findViewById(R.id.wbAnswer);
+        TextView tvUser = (TextView) view.findViewById(R.id.tvUser);
+
+        ImageView ivUser = (ImageView) view.findViewById(R.id.ivUser);
+        wbAnswer.loadData(StringUtil.parseSourceCode(answer.getBody()), "text/html", "UTF-8");
+        tvUser.setText(answer.getOwner().getDisplay_name());
+
+        Glide.with(ivUser.getContext())
+                .load(answer.getOwner().getProfile_image())
+                .into(ivUser);
+
+        if (answer.is_accepted())
+            tvAcceptedAnswer.setVisibility(View.VISIBLE);
+        else
+            tvAcceptedAnswer.setVisibility(View.GONE);
+
+        return view;
     }
 }

@@ -2,21 +2,42 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/tvAnswer"
+        android:id="@+id/tvAcceptedAnswer"
+        android:visibility="invisible"
+        android:textAllCaps="true"
+        android:text="Accepted Answer"
+        android:textColor="@color/colorPrimaryDark"
+        android:textStyle="bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+    <WebView
+        android:id="@+id/wbAnswer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"/>
+
     <TextView
         android:id="@+id/tvUser"
+        android:layout_gravity="right"
+        android:layout_marginBottom="5dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
     <ImageView
         android:id="@+id/ivUser"
+        android:layout_gravity="right"
         android:layout_width="wrap_content"
         android:layout_height="30dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorDivider"
+        android:layout_marginTop="10dp" />
 
 </LinearLayout>
