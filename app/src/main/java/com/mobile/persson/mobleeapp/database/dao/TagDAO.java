@@ -46,8 +46,4 @@ public class TagDAO {
         realm.commitTransaction();
         realm.close();
     }
-
-    public int getSize() {
-        return dbHelper.getRealm().where(TagItemModel.class).findAll().size();
-    }
 }

@@ -43,18 +43,6 @@ public class QuestionDAO {
         return dbHelper.getRealm().where(QuestionItemModel.class).equalTo("question_id", question_id).findFirst();
     }
 
-    public int getSize() {
-        return dbHelper.getRealm().where(QuestionItemModel.class).findAll().size();
-    }
-
-    public void deleteQuestionsByTag(String tag) {
-        Realm realm = dbHelper.getRealm();
-        realm.beginTransaction();
-        realm.where(QuestionItemModel.class).equalTo("tag", tag).findAll().deleteAllFromRealm();
-        realm.commitTransaction();
-        realm.close();
-    }
-
     public void deleteAllQuestions() {
         Realm realm = dbHelper.getRealm();
         realm.beginTransaction();
@@ -62,5 +50,4 @@ public class QuestionDAO {
         realm.commitTransaction();
         realm.close();
     }
-
 }

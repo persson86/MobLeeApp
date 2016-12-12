@@ -33,14 +33,6 @@ public class DatabaseHelper {
         return Realm.getInstance(getConfiguration(context));
     }
 
-    public void clearDataBase() {
-        Realm.deleteRealm(getConfiguration(context));
-    }
-
-    public void clearDataBase(Context context) {
-        Realm.deleteRealm(getConfiguration(context));
-    }
-
     private RealmConfiguration getConfiguration(Context context) {
         if (configuration == null) {
             configuration = new RealmConfiguration.Builder(context)

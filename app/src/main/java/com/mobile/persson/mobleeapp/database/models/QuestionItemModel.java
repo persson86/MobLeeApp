@@ -1,7 +1,5 @@
 package com.mobile.persson.mobleeapp.database.models;
 
-import com.google.gson.annotations.SerializedName;
-
 import io.realm.RealmObject;
 
 /**
@@ -9,17 +7,11 @@ import io.realm.RealmObject;
  */
 
 public class QuestionItemModel extends RealmObject {
-    @SerializedName("owner")
     public OwnerModel owner;
-    @SerializedName("score")
     private int score;
-    @SerializedName("last_activity_date")
     private String last_activity_date;
-    @SerializedName("question_id")
     private int question_id;
-    @SerializedName("title")
     private String title;
-    @SerializedName("body")
     private String body;
 
     private String tag;

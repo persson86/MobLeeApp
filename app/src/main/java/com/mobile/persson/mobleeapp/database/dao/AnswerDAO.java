@@ -44,23 +44,11 @@ public class AnswerDAO {
         return result;
     }
 
-    public void deleteAnswersByQuestion(long questionId) {
-        Realm realm = dbHelper.getRealm();
-        realm.beginTransaction();
-        realm.where(AnswerItemModel.class).equalTo("question_id", questionId).findAll().deleteAllFromRealm();
-        realm.commitTransaction();
-        realm.close();
-    }
-
     public void deleteAllAnswers() {
         Realm realm = dbHelper.getRealm();
         realm.beginTransaction();
         realm.where(AnswerItemModel.class).findAll().deleteAllFromRealm();
         realm.commitTransaction();
         realm.close();
-    }
-
-    public int getSize() {
-        return dbHelper.getRealm().where(AnswerItemModel.class).findAll().size();
     }
 }

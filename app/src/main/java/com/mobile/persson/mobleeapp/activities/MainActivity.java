@@ -4,6 +4,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -75,12 +77,9 @@ public class MainActivity extends AppCompatActivity {
         startDialog();
         cleanRealm();
         setScreenConfig();
-        getGetRelatedTags();
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
+        if (isConnectedToInternet())
+            getGetRelatedTags();
     }
 
     private void startDialog() {
@@ -198,5 +197,15 @@ public class MainActivity extends AppCompatActivity {
 
         tagList = new ArrayList<>(new LinkedHashSet<>(tagList));
         return tagList;
+    }
+
+    private boolean isConnectedToInternet() {
+        ConnectivityManager cm = (ConnectivityManager) MainActivity.this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if (activeNetwork == null) {
+            Toast.makeText(context, getString(R.string.msg_no_internet), Toast.LENGTH_LONG).show();
+            return false;
+        } else
+            return true;
     }
 }

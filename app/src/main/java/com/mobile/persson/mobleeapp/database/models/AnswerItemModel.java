@@ -1,23 +1,16 @@
 package com.mobile.persson.mobleeapp.database.models;
 
-import com.google.gson.annotations.SerializedName;
-
 import io.realm.RealmObject;
 
 /**
  * Created by persson on 08/12/16.
  */
 
-public class AnswerItemModel extends RealmObject{
-    @SerializedName("owner")
+public class AnswerItemModel extends RealmObject {
     public OwnerModel owner;
-    @SerializedName("answer_id")
     private int answer_id;
-    @SerializedName("question_id")
     private int question_id;
-    @SerializedName("body")
     private String body;
-    @SerializedName("is_accepted")
     private boolean is_accepted;
 
     public String getBody() {

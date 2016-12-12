@@ -1,7 +1,5 @@
 package com.mobile.persson.mobleeapp.database.models;
 
-import com.google.gson.annotations.SerializedName;
-
 import java.util.List;
 
 /**
@@ -9,7 +7,6 @@ import java.util.List;
  */
 
 public class AnswerModel {
-    @SerializedName("items")
     List<AnswerItemModel> items;
 
     public List<AnswerItemModel> getItems() {

@@ -13,12 +13,6 @@ public class StringUtil {
     private static final String PARSED_PATTERN_BEGIN = "<font color=\"#888888\"><tt>";
     private static final String PARSED_PATTERN_END = "</tt></font>";
 
-/*    public static Spanned convertHtmlToText(String htmlContent) {
-        String htmlAsString = htmlContent;
-        Spanned htmlAsSpanned = Html.fromHtml(htmlAsString);
-        return htmlAsSpanned;
-    }*/
-
     public static Spanned parse(String text) {
         if (text == null) return null;
 
@@ -47,15 +41,12 @@ public class StringUtil {
             result.append(code);
             result.append(PARSED_PATTERN_END);
 
-            //replace in the original text to find the next appearance
             text = text.replaceFirst(ORIGINAL_PATTERN_BEGIN, PARSED_PATTERN_BEGIN);
             text = text.replaceFirst(ORIGINAL_PATTERN_END, PARSED_PATTERN_END);
 
-            //update the string index to process
             beginIndexToProcess = text.lastIndexOf(PARSED_PATTERN_END) + PARSED_PATTERN_END.length();
         }
 
-        //add the rest of the string
         result.append(text.substring(beginIndexToProcess, text.length()));
 
         return result.toString();

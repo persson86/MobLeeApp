@@ -176,7 +176,7 @@ public class QuestionsActivity extends AppCompatActivity {
     }
 
     private void onClickListener(boolean fromRealm) {
-        if (fromRealm){
+        if (fromRealm) {
             questionItemModelList = new ArrayList<>();
             questionItemModelList = questionDAO.getQuestionsByTag(tag);
         }

@@ -67,7 +67,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
     @ViewById
     TextView tvToolbarTitle;
     @ViewById
-    WebView wbBody;
+    WebView wvBody;
 
     @AfterViews
     void initialize() {
@@ -118,7 +118,10 @@ public class QuestionDetailActivity extends AppCompatActivity {
     private void loadHeaderContent() {
         QuestionItemModel questionItemModel = questionDAO.getQuestionById(questionId);
         tvTitle.setText(questionItemModel.getTitle());
-        wbBody.loadData(StringUtil.parseSourceCode(questionItemModel.getBody()), "text/html", "UTF-8");
+        wvBody.loadData(StringUtil.parseSourceCode(
+                questionItemModel.getBody()),
+                getString(R.string.html_text),
+                getString(R.string.html_utf));
     }
 
     @Background
@@ -169,12 +172,17 @@ public class QuestionDetailActivity extends AppCompatActivity {
     public void setAnswersLayout(boolean fromRealm) {
         loadHeaderContent();
 
-
         LinearLayout llContent = (LinearLayout) findViewById(R.id.llContent);
         List<AnswerItemModel> list = adjustContentList(fromRealm);
 
         int numAnswers = list.size();
-        String totalAnswers = String.valueOf(numAnswers) + " " + "Answers";
+        String totalAnswers;
+
+        if (numAnswers <= 1 )
+            totalAnswers = String.valueOf(numAnswers) + " " + getString(R.string.tit_answer);
+        else
+            totalAnswers = String.valueOf(numAnswers) + " " + getString(R.string.tit_answers);
+
         tvNumberAnswers.setText(totalAnswers);
 
         for (AnswerItemModel answer : list)
@@ -201,11 +209,14 @@ public class QuestionDetailActivity extends AppCompatActivity {
         inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.item_answer_list, null);
         TextView tvAcceptedAnswer = (TextView) view.findViewById(R.id.tvAcceptedAnswer);
-        WebView wbAnswer = (WebView) view.findViewById(R.id.wbAnswer);
+        WebView wvAnswer = (WebView) view.findViewById(R.id.wbAnswer);
         TextView tvUser = (TextView) view.findViewById(R.id.tvUser);
 
         ImageView ivUser = (ImageView) view.findViewById(R.id.ivUser);
-        wbAnswer.loadData(StringUtil.parseSourceCode(answer.getBody()), "text/html", "UTF-8");
+        wvAnswer.loadData(StringUtil.parseSourceCode(
+                answer.getBody()),
+                getString(R.string.html_text),
+                getString(R.string.html_utf));
         tvUser.setText(answer.getOwner().getDisplay_name());
 
         Glide.with(ivUser.getContext())

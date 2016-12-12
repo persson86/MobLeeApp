@@ -20,14 +20,8 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //sleepScreen();
-
         Intent it = new Intent(this, MainActivity_.class);
         startActivity(it);
         finish();
-    }
-
-    public void sleepScreen() {
-        SystemClock.sleep(TimeUnit.SECONDS.toMillis(2));
     }
 }
