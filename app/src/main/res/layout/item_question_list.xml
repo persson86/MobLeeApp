@@ -11,12 +11,12 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:paddingBottom="8dp"
-        android:paddingLeft="8dp">
+        android:paddingStart="8dp">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
             android:gravity="center"
             android:orientation="vertical">
 
@@ -30,16 +30,15 @@
                 style="@style/cardTextViewUser"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Score" />
+                android:text="@string/tit_score" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingRight="8dp"
+            android:paddingEnd="8dp"
             android:paddingTop="8dp">
-
 
             <TextView
                 android:id="@+id/tvTitle"
@@ -47,14 +46,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
-                android:maxLines="3" />
+                android:maxLines="3"
+                android:paddingBottom="20dp" />
 
             <TextView
                 android:id="@+id/tvUser"
                 style="@style/cardTextViewUser"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right"
+                android:layout_gravity="end"
                 android:layout_marginBottom="5dp"
                 android:textColor="@color/colorSecundaryText" />
 
@@ -62,7 +62,7 @@
                 android:id="@+id/ivUser"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
-                android:layout_gravity="right" />
+                android:layout_gravity="end" />
 
         </LinearLayout>
     </LinearLayout>

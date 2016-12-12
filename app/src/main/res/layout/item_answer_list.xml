@@ -9,7 +9,7 @@
         android:id="@+id/tvAcceptedAnswer"
         android:visibility="invisible"
         android:textAllCaps="true"
-        android:text="Accepted Answer"
+        android:text="@string/tit_accepted_answer"
         android:textColor="@color/colorPrimaryDark"
         android:textStyle="bold"
         android:layout_width="wrap_content"
@@ -23,14 +23,14 @@
 
     <TextView
         android:id="@+id/tvUser"
-        android:layout_gravity="right"
+        android:layout_gravity="end"
         android:layout_marginBottom="5dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
     <ImageView
         android:id="@+id/ivUser"
-        android:layout_gravity="right"
+        android:layout_gravity="end"
         android:layout_width="wrap_content"
         android:layout_height="30dp" />
 

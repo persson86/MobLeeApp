@@ -15,6 +15,8 @@
     <string name="tit_question_detail">Question Detail</string>
     <string name="tit_answer">answer</string>
     <string name="tit_answers">answers</string>
+    <string name="tit_score">Score</string>
+    <string name="tit_accepted_answer">accepted answer</string>
 
     <string name="html_text">text/html</string>
     <string name="html_utf">UTF-8</string>

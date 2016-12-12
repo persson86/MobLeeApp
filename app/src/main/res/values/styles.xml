@@ -23,18 +23,17 @@
 
     <style name="cardTextViewTitle">
         <item name="android:textColor">@color/colorPrimaryText</item>
-        <item name="android:textSize">12dp</item>
+        <item name="android:textSize">18sp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:paddingBottom">20dp</item>
     </style>
 
     <style name="cardTextViewUser">
         <item name="android:textColor">@color/colorSecundaryText</item>
-        <item name="android:textSize">10dp</item>
+        <item name="android:textSize">12sp</item>
     </style>
 
     <style name="cardTextViewSecundary">
         <item name="android:textColor">@color/colorSecundaryText</item>
-        <item name="android:textSize">12dp</item>
+        <item name="android:textSize">14sp</item>
     </style>
 </resources>
